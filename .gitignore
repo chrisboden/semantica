@@ -1,0 +1,9 @@
+.env
+search.egg-info
+*.pycache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
