@@ -1,70 +1,100 @@
-# Semantic Search Boilerplate
+# Knowledgebase Semantic Search
 
-A semantic search implementation using FAISS for vector storage, SQLite for metadata, and OpenAI embeddings.
+A modular semantic search implementation using FAISS for vector storage, SQLite for metadata, and OpenAI embeddings. Allows for creating and searching through a knowledgebase (kb)
 
 ## Features
 
+- Modular architecture with clear separation of concerns
 - Ingest data from JSON files into SQLite database
 - Generate embeddings using OpenAI's text-embedding-3-small model
-- Store and search vectors using FAISS with direct mapping to SQLite records via vector_index
+- Store and search vectors using FAISS with direct mapping to SQLite records
 - Semantic search with k-nearest neighbors
 - LLM-powered answer generation using OpenRouter
 
 ## Setup
 
-1. Install dependencies:
+1. Install the package:
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
-2. Create a `.env` file with your API keys:
-```
-OPENAI_API_KEY=your_openai_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-```
+2. Rename the `.env-example` file to `.env` file and add your API keys:
 
 ## Usage
 
-The system provides several CLI commands:
+The system provides several CLI commands through the `kb` command:
 
 1. Ingest data:
+Imports data from the nominated json file to the sqlite database.
+
 ```bash
-python3 search.py ingest-data data.json
+kb ingest-data data.json
 ```
 
-2. Generate embeddings:
+1. Generate embeddings:
+Iterates through each item in the database and submits them to Openai's embedding api
+
 ```bash
-python3 search.py embed-items knowledge.db
+kb embed-items
 ```
 
-3. Run a search:
+1. Run a search:
 ```bash
-python3 search.py search "your search query here"
+kb search "your search query here"
 ```
 
-### Individual Commands
+## Architecture
 
-You can also use the individual components:
+The system is organized into several modules:
 
-- Generate query embedding:
-```bash
-python3 search.py embed-query "your query text"
+```mermaid
+graph TD
+    A[Terminal: 'kb' command] --> B[Entry Point: main()]
+    B --> C[Click CLI Group]
+    C --> D[ingest-data command]
+    C --> E[embed-items command]
+    C --> F[search command]
+    D --> G[database.py]
+    E --> H[embeddings.py]
+    F --> I[llm.py]
+    G --> J[SQLite DB]
+    H --> K[FAISS Index]
+    I --> L[OpenRouter API]
 ```
 
-- Look up metadata by IDs:
-```bash
-python3 search.py lookup-metadata "id1,id2,id3"
-```
+### Modules
 
-- Look up vectors:
-```bash
-python3 search.py lookup-vectors "[vector_array]" --k 5
-```
+- `config.py`: Configuration and environment variables
+- `database.py`: SQLite database operations
+- `embeddings.py`: Vector operations and FAISS index management
+- `llm.py`: LLM prompt handling and API calls
+- `cli.py`: Command-line interface
 
-- Run prompt:
-```bash
-python3 search.py run-prompt "your question" "id1,id2,id3"
+
+## Command Flow
+
+When you run a command, here's what happens:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI
+    participant DB
+    participant Embeddings
+    participant LLM
+    
+    User->>CLI: kb command
+    CLI->>DB: Check if DB exists
+    DB-->>CLI: DB status
+    CLI->>Embeddings: Generate query embedding
+    Embeddings-->>CLI: Query vector
+    CLI->>Embeddings: Search similar vectors
+    Embeddings-->>CLI: Similar vector indices
+    CLI->>DB: Lookup metadata
+    DB-->>CLI: Item metadata
+    CLI->>LLM: Generate response
+    LLM-->>CLI: Answer
+    CLI->>User: Display result
 ```
 
 ## Data Format
@@ -85,14 +115,20 @@ The input JSON file should follow this schema:
 
 ## Files
 
-- `search.py`: Main implementation
+- `src/`: Main package directory containing all modules
+  - `__init__.py`: Package initialization
+  - `cli.py`: Command-line interface
+  - `config.py`: Configuration settings
+  - `database.py`: Database operations
+  - `embeddings.py`: Vector operations
+  - `llm.py`: LLM interactions
 - `query_prompt.md`: Prompt template for LLM
 - `knowledge.db`: SQLite database with items and their vector indices
 - `vectors.faiss`: FAISS vector index with 1:1 mapping to database records
 
 ## Implementation Details
 
-The system maintains a direct 1:1 mapping between FAISS vector indices and SQLite records using a `vector_index` column in the database. This ensures that item N in the FAISS index corresponds exactly to the database record with `vector_index=N`, eliminating the need for any intermediate mapping files.
+The system maintains a direct 1:1 mapping between FAISS vector indices and SQLite records using a `vector_index` column in the database. This ensures that item N in the FAISS index corresponds exactly to the database record with `vector_index=N`.
 
 Here's how it works:
 

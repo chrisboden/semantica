@@ -21,6 +21,7 @@ def run_prompt(user_query: str, vector_indices: List[int]) -> Optional[str]:
 Author: {item['author']}
 Type: {item['action_type']}
 
+
 -----------"""
         context_items.append(context_item)
     

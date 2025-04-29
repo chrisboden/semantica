@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="search",
+    name="kb",
     version="0.1.0",
     packages=find_packages(),
     include_package_data=True,
@@ -15,7 +15,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'search=src.cli:main',
+            'kb=src.cli:main',
         ],
     },
 ) 
