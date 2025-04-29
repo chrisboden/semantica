@@ -49,17 +49,17 @@ The system is organized into several modules:
 
 ```mermaid
 graph TD
-    A[Terminal: 'kb' command] --> B[Entry Point: main()]
-    B --> C[Click CLI Group]
-    C --> D[ingest-data command]
-    C --> E[embed-items command]
-    C --> F[search command]
-    D --> G[database.py]
-    E --> H[embeddings.py]
-    F --> I[llm.py]
-    G --> J[SQLite DB]
-    H --> K[FAISS Index]
-    I --> L[OpenRouter API]
+    A["Terminal: 'kb' command"] --> B["Entry Point: main()"]
+    B --> C["Click CLI Group"]
+    C --> D["ingest-data command"]
+    C --> E["embed-items command"]
+    C --> F["search command"]
+    D --> G["database.py"]
+    E --> H["embeddings.py"]
+    F --> I["llm.py"]
+    G --> J["SQLite DB"]
+    H --> K["FAISS Index"]
+    I --> L["OpenRouter API"]
 ```
 
 ### Modules
@@ -83,7 +83,7 @@ sequenceDiagram
     participant Embeddings
     participant LLM
     
-    User->>CLI: kb command
+    User->>CLI: search command
     CLI->>DB: Check if DB exists
     DB-->>CLI: DB status
     CLI->>Embeddings: Generate query embedding
